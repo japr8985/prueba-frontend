@@ -88,14 +88,46 @@
                         ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
-                        <v-text-field
-                            name="birthday"
-                            label="Birthday"
-                            id="birthday"
-                            v-model="user.birthday"
-                            prepend-icon="mdi-cake"
+                        <v-menu
+                            ref="menu"
+                            v-model="menu"
                             :disabled="!editing"
-                        ></v-text-field>
+                            :close-on-content-click="false"
+                            :return-value.sync="user.birthday"
+                            transition="scale-transition"
+                            offset-y>
+                            <template v-slot:activator="{ on, attrs }">
+                            <v-text-field
+                                v-model="user.birthday"
+                                label="Birthday"
+                                prepend-icon="mdi-calendar"
+                                readonly
+                                v-bind="attrs"
+                                v-on="on"
+                            ></v-text-field>
+                            </template>
+                            <v-date-picker
+                            v-model="user.birthday"
+                            no-title
+                            scrollable
+                            >
+                            <v-spacer></v-spacer>
+                            <v-btn
+                                text
+                                color="primary"
+                                @click="menu = false"
+                            >
+                                Cancel
+                            </v-btn>
+                            <v-btn
+                                text
+                                color="primary"
+                                @click="$refs.menu.save(user.birthday)"
+                            >
+                                OK
+                            </v-btn>
+                            </v-date-picker>
+                        </v-menu>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
                         <v-switch
@@ -144,6 +176,7 @@ export default {
     },
     data: () => ({
         user: {},
+        menu: false,
         genders: [],
         editing: false,
         showWarning: false,
