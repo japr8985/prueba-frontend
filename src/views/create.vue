@@ -35,7 +35,9 @@
                             id="name"
                             v-model="user.name"
                             prepend-icon="mdi-account"
-                            
+                            hide-details="auto"
+                            :color="errors.name ? 'error' : ''"
+                            :error-messages="errors.name"
                         ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
@@ -45,6 +47,9 @@
                             id="email"
                             v-model="user.email"
                             prepend-icon="mdi-email"
+                            hide-details="auto"
+                            :color="errors.email ? 'error' : ''"
+                            :error-messages="errors.email"
                             
                         ></v-text-field>
                     </v-flex>
@@ -55,7 +60,9 @@
                             item-value="id"
                             item-text="name"
                             v-model="user.gender_id"
-                            
+                            hide-details="auto"
+                            :color="errors.gender_id ? 'error' : ''"
+                            :error-messages="errors.gender_id"
                         ></v-select>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
@@ -66,7 +73,9 @@
                             type="number"
                             v-model="user.age"
                             prepend-icon="mdi-cake-variant"
-                            
+                            hide-details="auto"
+                            :color="errors.birthday ? 'error' : ''"
+                            :error-messages="errors.birthday"
                         ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
@@ -78,14 +87,17 @@
                             transition="scale-transition"
                             offset-y>
                             <template v-slot:activator="{ on, attrs }">
-                            <v-text-field
-                                v-model="user.birthday"
-                                label="Birthday"
-                                prepend-icon="mdi-calendar"
-                                readonly
-                                v-bind="attrs"
-                                v-on="on"
-                            ></v-text-field>
+                                <v-text-field
+                                    v-model="user.birthday"
+                                    label="Birthday"
+                                    prepend-icon="mdi-calendar"
+                                    readonly
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    hide-details="auto"
+                                    :color="errors.email ? 'error' : ''"
+                                    :error-messages="errors.email"
+                                    ></v-text-field>
                             </template>
                             <v-date-picker
                             v-model="user.birthday"
@@ -122,6 +134,9 @@
                             name="info"
                             label="Info"
                             v-model="user.info"
+                            hide-details="auto"
+                            :color="errors.email ? 'error' : ''"
+                            :error-messages="errors.email"
                             ></v-textarea>
                     </v-flex>
                 </v-layout>    
@@ -150,9 +165,6 @@
 <script>
 
 export default {
-    components: {
-        
-    },
     data: () => ({
         user: {},
         genders: [],
@@ -163,6 +175,7 @@ export default {
             text: '',
             isError: false
         },
+        errors: {},
         menu: false
     }),
     computed: {
@@ -181,7 +194,11 @@ export default {
                 this.genders = response
             })
             .catch(error => {
-                console.log(error)
+                this.snackbar = {
+                    show: true,
+                    text: error.statusText,
+                    isError: true
+                }
             })
         },
         submit() {
@@ -195,6 +212,11 @@ export default {
                 }
             })
             .catch(error => {
+                console.log(error)
+                const e = error.data.errors
+                Object.keys(e).forEach(key => {
+                    this.errors[key] = e[key][0]
+                })
                 this.snackbar = {
                     show: true,
                     text: error.statusText,
