@@ -41,6 +41,20 @@ export default {
                 })
             })
         },
+        create({ commit }, data) {
+            commit('LOADING', true)
+            return new Promise((resolve, reject) => {
+                axios.post(`http://localhost:8000/api/users/`, data)
+                .then(response => {
+                    commit('LOADING', false)
+                    resolve(response.data)
+                })
+                .catch(error => {
+                    commit('LOADING', false)
+                    reject(error.response)
+                })
+            })
+        },
         update({ commit }, data) {
             commit('LOADING', true)
             return new Promise((resolve, reject) => {

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <v-form @submit.prevent="submit">
         <v-card >
         <v-img height="200px" src="https://cdn.pixabay.com/photo/2020/07/12/07/47/bee-5396362_1280.jpg">
           <v-app-bar flat color="rgba(0, 0, 0, 0)">
@@ -12,26 +12,7 @@
 
             <v-spacer></v-spacer>
 
-            <v-menu bottom left rounded>
-                <template v-slot:activator="{ on, attrs }">
-                    <v-btn dark icon v-bind="attrs" v-on="on">
-                        <v-icon>mdi-dots-vertical</v-icon>
-                    </v-btn>
-                </template>
-
-                <v-list>
-                    <v-list-item>
-                        <v-list-item-title @click='editing = true'>
-                            Edit
-                        </v-list-item-title>
-                    </v-list-item>
-                    <v-list-item>
-                        <v-list-item-title @click='showWarning = true'>
-                            Delete
-                        </v-list-item-title>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
+            
           </v-app-bar>
 
           <v-card-title class="white--text mt-8">
@@ -54,7 +35,7 @@
                             id="name"
                             v-model="user.name"
                             prepend-icon="mdi-account"
-                            :disabled="!editing"
+                            
                         ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
@@ -64,7 +45,7 @@
                             id="email"
                             v-model="user.email"
                             prepend-icon="mdi-email"
-                            :disabled="!editing"
+                            
                         ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
@@ -74,7 +55,7 @@
                             item-value="id"
                             item-text="name"
                             v-model="user.gender_id"
-                            :disabled="!editing"
+                            
                         ></v-select>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
@@ -84,7 +65,7 @@
                             id="age"
                             v-model="user.age"
                             prepend-icon="mdi-cake-variant"
-                            :disabled="!editing"
+                            
                         ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
@@ -94,14 +75,14 @@
                             id="birthday"
                             v-model="user.birthday"
                             prepend-icon="mdi-cake"
-                            :disabled="!editing"
+                            
                         ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
                         <v-switch
                         v-model="user.married"
                         :label="`Married: ${married}`"
-                        :disabled="!editing"
+                        
                         ></v-switch>
                     </v-flex>
                     <v-flex xs12 sm12 md12>
@@ -109,21 +90,19 @@
                             name="info"
                             label="Info"
                             v-model="user.info"
-                            :disabled="!editing"></v-textarea>
+                            ></v-textarea>
                     </v-flex>
                 </v-layout>    
             </v-container>
         </v-card-text>
-        <v-card-actions v-if="editing">
-            <v-btn text @click="resetData">
+        <v-card-actions >
+            <v-btn text type="reset">
                 Cancel
             </v-btn>
             <v-spacer></v-spacer>
-            <v-btn color="info" @click="update">Update</v-btn>
+            <v-btn color="info" type="submit">Create</v-btn>
         </v-card-actions>
-    </v-card>
-    <DeleteUser :show="showWarning" :id="user.id" @close="showWarning = false"/>
-
+        </v-card>
     <v-snackbar v-model="snackbar.show" :color="snackbar.isError ? 'error' : 'success'">
       {{ snackbar.text }}
       <template v-slot:action="{ attrs }">
@@ -133,14 +112,14 @@
       </template>
     </v-snackbar>
 
-    </div>
+    </v-form>
 </template>
 
 <script>
-import DeleteUser from '@/components/deleteUser'
+
 export default {
     components: {
-        DeleteUser
+        
     },
     data: () => ({
         user: {},
@@ -160,24 +139,9 @@ export default {
     },
     mounted(){
         this.getGenders()
-        this.getUser()
+        
     },
     methods: {
-        getUser() {
-            const id = this.$route.params.id
-            this.$store.dispatch('users/show', id)
-            .then(response => {
-                this.user = response
-            })
-            .catch(error => {
-
-                this.snackbar = {
-                    show: true,
-                    text: error.statusText,
-                    isError: true
-                }
-            })
-        },
         getGenders() {
             this.$store.dispatch('users/genders')
             .then(response => {
@@ -187,23 +151,22 @@ export default {
                 console.log(error)
             })
         },
-        update() {
-            this.$store.dispatch('users/update', this.user)
+        submit() {
+            this.$store.dispatch('users/create', this.user)
             .then(response => {
-                this.user = response
                 this.snackbar = {
                     show: true,
-                    text: `User ${this.user.name} has been updated`,
+                    text: `User ${response.name} has been created successfully`,
                     isError: false
                 }
             })
             .catch(error => {
-                console.log(error)
+                this.snackbar = {
+                    show: true,
+                    text: error.statusText,
+                    isError: true
+                }
             })
-        },
-        resetData() {
-            this.getUser()
-            this.editing = false
         }
     }
 }

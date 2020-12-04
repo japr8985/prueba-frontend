@@ -25,6 +25,12 @@
         </template>
       </v-data-table>
     </v-card-text>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn color="info" :to="{ name: 'user-create'}" >
+        Create User
+    </v-btn>
+    </v-card-actions>
   </v-card>
 </template>
 
