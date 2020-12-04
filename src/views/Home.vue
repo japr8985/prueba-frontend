@@ -8,7 +8,7 @@
         Dev: Jorge Peraza
       </p>
       <v-btn color="success" :to="{name: 'users'}">
-        Strat
+        Start
       </v-btn>
     </v-card-text>
   </v-card>
