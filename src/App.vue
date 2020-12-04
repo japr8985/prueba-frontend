@@ -38,7 +38,9 @@
     </v-app-bar>
 
     <v-main>
-      <router-view />
+      <v-container grid-list-xs>
+        <router-view />
+      </v-container>
     </v-main>
   </v-app>
 </template>

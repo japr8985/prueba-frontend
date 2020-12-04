@@ -63,20 +63,54 @@
                             name="age"
                             label="Age"
                             id="age"
+                            type="number"
                             v-model="user.age"
                             prepend-icon="mdi-cake-variant"
                             
                         ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
-                        <v-text-field
-                            name="birthday"
-                            label="Birthday"
-                            id="birthday"
+                        <v-menu
+                            ref="menu"
+                            v-model="menu"
+                            :close-on-content-click="false"
+                            :return-value.sync="user.birthday"
+                            transition="scale-transition"
+                            offset-y
+                            max-width="290px"
+                            min-width="290px">
+                            <template v-slot:activator="{ on, attrs }">
+                            <v-text-field
+                                v-model="user.birthday"
+                                label="Birthday"
+                                prepend-icon="mdi-calendar"
+                                readonly
+                                v-bind="attrs"
+                                v-on="on"
+                            ></v-text-field>
+                            </template>
+                            <v-date-picker
                             v-model="user.birthday"
-                            prepend-icon="mdi-cake"
-                            
-                        ></v-text-field>
+                            no-title
+                            scrollable
+                            >
+                            <v-spacer></v-spacer>
+                            <v-btn
+                                text
+                                color="primary"
+                                @click="menu = false"
+                            >
+                                Cancel
+                            </v-btn>
+                            <v-btn
+                                text
+                                color="primary"
+                                @click="$refs.menu.save(user.birthday)"
+                            >
+                                OK
+                            </v-btn>
+                            </v-date-picker>
+                        </v-menu>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
                         <v-switch
@@ -130,7 +164,8 @@ export default {
             show: false,
             text: '',
             isError: false
-        }
+        },
+        menu: false
     }),
     computed: {
         married() {
@@ -152,6 +187,7 @@ export default {
             })
         },
         submit() {
+            this.user.married = this.user.married ? true : false
             this.$store.dispatch('users/create', this.user)
             .then(response => {
                 this.snackbar = {
