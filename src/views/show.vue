@@ -3,8 +3,9 @@
         <v-card >
         <v-img height="200px" src="https://cdn.pixabay.com/photo/2020/07/12/07/47/bee-5396362_1280.jpg">
           <v-app-bar flat color="rgba(0, 0, 0, 0)">
-            <v-app-bar-nav-icon color="white"></v-app-bar-nav-icon>
-
+            <v-btn color="white" icon @click="$router.go(-1)">
+                <v-icon>mdi-arrow-left</v-icon>
+            </v-btn>
             <v-toolbar-title class="title white--text pl-0">
               User
             </v-toolbar-title>
@@ -112,6 +113,16 @@
         </v-card-actions>
     </v-card>
     <DeleteUser :show="showWarning" :id="user.id" @close="showWarning = false"/>
+
+    <v-snackbar v-model="snackbar.show" :color="snackbar.isError ? 'error' : 'success'">
+      {{ snackbar.text }}
+      <template v-slot:action="{ attrs }">
+        <v-btn  color="white" icon @click="snackbar.show = false" v-bind="attrs">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </template>
+    </v-snackbar>
+
     </div>
 </template>
 
@@ -125,7 +136,12 @@ export default {
         user: {},
         genders: [],
         editing: false,
-        showWarning: false
+        showWarning: false,
+        snackbar: {
+            show: false,
+            text: '',
+            isError: false
+        }
     }),
     computed: {
         married() {
@@ -144,7 +160,12 @@ export default {
                 this.user = response
             })
             .catch(error => {
-                console.log(error)
+
+                this.snackbar = {
+                    show: true,
+                    text: error.statusText,
+                    isError: true
+                }
             })
         },
         getGenders() {
@@ -160,6 +181,11 @@ export default {
             this.$store.dispatch('users/update', this.user)
             .then(response => {
                 this.user = response
+                this.snackbar = {
+                    show: true,
+                    text: `User ${this.user.name} has been updated`,
+                    isError: false
+                }
             })
             .catch(error => {
                 console.log(error)
